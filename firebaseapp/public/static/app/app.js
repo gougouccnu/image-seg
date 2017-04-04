@@ -27,6 +27,14 @@ var canvas = new fabric.Canvas('canvas'),
 
 
 initialize_ui = function () {
+
+    //lsw added
+    canvas.setWidth(960);
+    canvas.setHeight(556);
+    console.log('get canvas size');
+    console.log(canvas.getWidth());
+    console.log(canvas.getHeight());
+
     var jsfeat_gui = new dat.GUI({ autoPlace: false });
     var pf_opt, slic_opt;
     //pf_opt = function () {
@@ -59,8 +67,11 @@ initialize_ui = function () {
         fr.onload = function () {
             img = new Image();
             img.onload = function () {
+                  console.log('image loaded.');
                   fabric.Image.fromURL(img.src, function (oImg) {
-                  console.log(img)
+                  console.log(oImg)
+                  // lsw added
+                  oImg.set({ left: 20, top: 50 });
                   canvas.add(oImg);
                 });
             };

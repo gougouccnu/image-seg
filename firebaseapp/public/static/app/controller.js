@@ -149,7 +149,37 @@ $scope.export = function() {
       alert('This browser doesn\'t provide means to serialize canvas to an image');
     }
     else {
-      window.open(output_canvas.toDataURL('png'));
+      //window.open(output_canvas.toDataURL('png'));
+    //   $('#output_canvas').get(0).toBlob(function(blob){
+	// 	saveAs(blob, "output.png");
+	//   });
+
+      var outputCanvas = new fabric.Canvas('output_canvas');
+      outputCanvas.setWidth(640);
+      outputCanvas.setHeight(640);
+      var rect = new fabric.Rect({
+  left: 100,
+  top: 100,
+  fill: 'red',
+  width: 20,
+  height: 20
+});
+      outputCanvas.add(rect); // add object
+      var rect2 = new fabric.Rect({
+  left: 140,
+  top: 140,
+  fill: 'red',
+  width: 20,
+  height: 20,
+  angle: 45
+});
+      outputCanvas.add(rect2);
+      outputCanvas.renderAll();
+      var htmlElement = $('#output_canvas')
+      console.log(htmlElement)
+      htmlElement.get(0).toBlob(function(blob){
+		saveAs(blob, "output.png");
+	  });
     }
   };
 
@@ -549,8 +579,18 @@ $scope.deselect = function(){
 
 
 $scope.renderResults = function(){
+
+    // set background red 
+    //output_canvas.setBgColor();
+
     var results = state.results;
     var context = output_canvas.getContext('2d');
+
+    //lsw
+    context.fillStyle="red";
+    context.fillRect(10,10,640,640);
+    context.globalCompositeOperation="source-over";
+
     var imageData = context.createImageData(output_canvas.width, output_canvas.height);
     var data = imageData.data;
     for (var i = 0; i < results.indexMap.length; ++i) {
@@ -565,7 +605,7 @@ $scope.renderResults = function(){
             data[4 * i + 3] = 0;
         }
     }
-    context.putImageData(imageData, 0, 0);
+    context.putImageData(imageData, 20, 20);
 };
 
 
@@ -643,7 +683,7 @@ $scope.check_movement = function(){
 $scope.segment = function () {
     $scope.setFreeDrawingMode(false,$scope.current_mode);
     $scope.check_movement();
-    if (state.masks_present) { 
+    if (state.masks_present) {
         $scope.status = "Starting segementation";
         if(canvas.isDrawingMode){
             canvas.isDrawingMode = false;
