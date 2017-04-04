@@ -349,6 +349,7 @@ $scope.updateCanvas = function () {
 
 $scope.labelUnknown = function(){
     var segments = state.results.segments;
+    // lsw added,bug 
     if(!state.results.background.length||!state.results.background.length ) {
         console.log("Please mark both Background and Foreground");
         _.each(state.results.unknown,function(k){segments[k].foreground = true});
@@ -586,11 +587,6 @@ $scope.renderResults = function(){
     var results = state.results;
     var context = output_canvas.getContext('2d');
 
-    //lsw
-    context.fillStyle="red";
-    context.fillRect(10,10,640,640);
-    context.globalCompositeOperation="source-over";
-
     var imageData = context.createImageData(output_canvas.width, output_canvas.height);
     var data = imageData.data;
     for (var i = 0; i < results.indexMap.length; ++i) {
@@ -605,7 +601,36 @@ $scope.renderResults = function(){
             data[4 * i + 3] = 0;
         }
     }
+    $scope.renderClipShape();
+    // 生成结果图
     context.putImageData(imageData, 20, 20);
+};
+
+$scope.renderClipShape = function(){
+
+    // set background red 
+    //output_canvas.setBgColor();
+
+    var results = state.results;
+    var context = canvas.getContext('2d');
+    
+    context.globalCompositeOperation="source-over";
+    // context.fillStyle="blue";
+    // context.fillRect(50,50,75,50);
+
+    var clipImageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    var data = clipImageData.data;
+    for (var i = 0; i < results.indexMap.length; ++i) {
+        if (i%8==1)
+        {
+            data[4 * i + 0] = 255
+            data[4 * i + 1] = 0
+            data[4 * i + 2] = 0
+            data[4 * i + 3] = 255;
+        }
+    }
+    // 生成分割图形 
+    context.putImageData(clipImageData, 20, 20);
 };
 
 
