@@ -29,8 +29,8 @@ var canvas = new fabric.Canvas('canvas'),
 initialize_ui = function () {
 
     //lsw added
-    canvas.setWidth(960);
-    canvas.setHeight(556);
+    canvas.setWidth(640);
+    canvas.setHeight(640);
     console.log('get canvas size');
     console.log(canvas.getWidth());
     console.log(canvas.getHeight());
@@ -71,7 +71,7 @@ initialize_ui = function () {
                   fabric.Image.fromURL(img.src, function (oImg) {
                   console.log(oImg)
                   // lsw added
-                  oImg.set({ left: 20, top: 50 });
+                  oImg.set({ left: 0, top: 0 });
                   canvas.add(oImg);
                 });
             };

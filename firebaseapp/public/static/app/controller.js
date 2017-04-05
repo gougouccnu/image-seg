@@ -601,36 +601,40 @@ $scope.renderResults = function(){
             data[4 * i + 3] = 0;
         }
     }
-    $scope.renderClipShape();
+    //$scope.renderClipShape();
     // 生成结果图
     context.putImageData(imageData, 20, 20);
 };
 
+
+
 $scope.renderClipShape = function(){
-
-    // set background red 
-    //output_canvas.setBgColor();
-
     var results = state.results;
-    var context = canvas.getContext('2d');
-    
-    context.globalCompositeOperation="source-over";
-    // context.fillStyle="blue";
-    // context.fillRect(50,50,75,50);
-
-    var clipImageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    var data = clipImageData.data;
+    var context = output_canvas.getContext('2d');
+    var imageData = context.createImageData(output_canvas.width, output_canvas.height);
+    var data = imageData.data;
+    var seg;
     for (var i = 0; i < results.indexMap.length; ++i) {
-        if (i%8==1)
-        {
-            data[4 * i + 0] = 255
-            data[4 * i + 1] = 0
-            data[4 * i + 2] = 0
-            data[4 * i + 3] = 255;
-        }
+            seg = results.segments[results.indexMap[i]];
+            data[4 * i + 3] = 0;
+            if (results.segments[results.indexMap[i]].background){  // Extremely naive pixel bondary
+                if (results.segments[results.indexMap[i+1]].foreground){
+                    data[4 * i + 0] = 0;
+                    data[4 * i + 1] = 0;
+                    data[4 * i + 2] = 0;
+                    data[4 * i + 3] = 255;
+                }
+            }
+            if (results.segments[results.indexMap[i]].foreground){
+                if (results.segments[results.indexMap[i+1]].background){
+                    data[4 * i + 0] = 0;
+                    data[4 * i + 1] = 0;
+                    data[4 * i + 2] = 0;
+                    data[4 * i + 3] = 255;
+                }
+            }
     }
-    // 生成分割图形 
-    context.putImageData(clipImageData, 20, 20);
+    context.putImageData(imageData, 0, 0);
 };
 
 
