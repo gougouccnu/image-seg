@@ -876,15 +876,23 @@ $scope.addOnClick = function(event) {
 function watchCanvas($scope) {
 
   function updateScope() {
+    console.log('ran into updateScope');
     $scope.$$phase || $scope.$digest();
     canvas.renderAll();
+  }
+
+  function segmentBtnClicked() {
+      console.log('ran into segmentBtnClicked');
+      var btn = document.getElementById('segment');
+      btn.click();
   }
 
   canvas
     .on('object:selected', updateScope)
     .on('group:selected', updateScope)
     .on('path:created', updateScope)
-    .on('selection:cleared', updateScope);
+    .on('selection:cleared', updateScope)
+    .on('path:created', segmentBtnClicked);
 }
 
 
