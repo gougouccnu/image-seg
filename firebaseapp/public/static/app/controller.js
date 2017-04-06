@@ -378,6 +378,7 @@ $scope.labelUnknown = function(){
 };
 
 $scope.labelMixed = function(){
+
 };
 
 $scope.updateClusters = function(){
@@ -440,26 +441,28 @@ $scope.updateClusters = function(){
 };
 
 $scope.renderSuperpixels = function(){
-    var results = state.results;
-    var context = output_canvas.getContext('2d');
-    var imageData = context.createImageData(output_canvas.width, output_canvas.height);
-    var data = imageData.data;
-    var seg;
-    for (var i = 0; i < results.indexMap.length; ++i) {
-            seg = results.segments[results.indexMap[i]];
-            data[4 * i + 3] = 255;
-            if (results.indexMap[i]== results.indexMap[i+1]){  // Extremely naive pixel bondary
-                data[4 * i + 0] = seg.mp[0];
-                data[4 * i + 1] = seg.mp[1];
-                data[4 * i + 2] = seg.mp[2];
-            }
-            else{
-                data[4 * i + 0] = 0;
-                data[4 * i + 1] = 0;
-                data[4 * i + 2] = 0;
-            }
-    }
-    context.putImageData(imageData, 0, 0);
+    // var results = state.results;
+    // var context = output_canvas.getContext('2d');
+    // var imageData = context.createImageData(output_canvas.width, output_canvas.height);
+    // var data = imageData.data;
+    // var seg;
+    // for (var i = 0; i < results.indexMap.length; ++i) {
+    //         seg = results.segments[results.indexMap[i]];
+    //         data[4 * i + 3] = 255;
+    //         if (results.indexMap[i]== results.indexMap[i+1]){  // Extremely naive pixel bondary
+    //             data[4 * i + 0] = seg.mp[0];
+    //             data[4 * i + 1] = seg.mp[1];
+    //             data[4 * i + 2] = seg.mp[2];
+    //         }
+    //         else{
+    //             data[4 * i + 0] = 0;
+    //             data[4 * i + 1] = 0;
+    //             data[4 * i + 2] = 0;
+    //         }
+    // }
+    // context.putImageData(imageData, 0, 0);
+    //$scope.renderClipShape();
+    $scope.renderClipShape2Src();
 };
 
 $scope.renderMixed = function(){
@@ -603,7 +606,7 @@ $scope.renderResults = function(){
     }
     //$scope.renderClipShape();
     // 生成结果图
-    context.putImageData(imageData, 20, 20);
+    context.putImageData(imageData, 0, 0);
 };
 
 
@@ -614,26 +617,95 @@ $scope.renderClipShape = function(){
     var imageData = context.createImageData(output_canvas.width, output_canvas.height);
     var data = imageData.data;
     var seg;
-    for (var i = 0; i < results.indexMap.length; ++i) {
-            seg = results.segments[results.indexMap[i]];
+    for (var i = 0; i < results.indexMap.length-1; ++i) {
+            //seg = results.segments[results.indexMap[i]];
             data[4 * i + 3] = 0;
             if (results.segments[results.indexMap[i]].background){  // Extremely naive pixel bondary
                 if (results.segments[results.indexMap[i+1]].foreground){
-                    data[4 * i + 0] = 0;
+                    data[4 * i + 0] = 255;
                     data[4 * i + 1] = 0;
                     data[4 * i + 2] = 0;
                     data[4 * i + 3] = 255;
+                    //console.log('edge pix..');
                 }
             }
+            // else {
+            //     //console.log('f*');
+            // }
             if (results.segments[results.indexMap[i]].foreground){
                 if (results.segments[results.indexMap[i+1]].background){
-                    data[4 * i + 0] = 0;
+                    data[4 * i + 0] = 255;
                     data[4 * i + 1] = 0;
                     data[4 * i + 2] = 0;
                     data[4 * i + 3] = 255;
+                    //console.log('edge pix..');
                 }
             }
+            //     else {
+            //         //console.log('ff');
+            //     }
+            // }
+            // else {
+            //     //console.log('b*');
+            // }
     }
+    context.stroke();
+    context.putImageData(imageData, 0, 0);
+};
+
+$scope.renderClipShape2Src = function(){
+    var results = state.results;
+    var context = canvas.getContext('2d');
+    var imageData = context.createImageData(canvas.width, canvas.height);
+    var srcImageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    var srcData = srcImageData.data;
+    var data = imageData.data;
+    var seg;
+    for (var i = 0; i < results.indexMap.length-1; ++i) {
+            //seg = results.segments[results.indexMap[i]];
+            //data[4 * i + 3] = 0;
+            if (results.segments[results.indexMap[i]].background){  // Extremely naive pixel bondary
+                if (results.segments[results.indexMap[i+1]].foreground){
+                    data[4 * i + 0] = 255;
+                    data[4 * i + 1] = 0;
+                    data[4 * i + 2] = 0;
+                    data[4 * i + 3] = 255;
+                    //console.log('edge pix..');
+                }
+                else {
+                    data[4 * i + 0] = srcData[4 * i + 0];
+                    data[4 * i + 1] = srcData[4 * i + 1];
+                    data[4 * i + 2] = srcData[4 * i + 2];
+                    data[4 * i + 3] = srcData[4 * i + 3];
+                }
+            }
+            // else {
+            //     //console.log('f*');
+            // }
+            if (results.segments[results.indexMap[i]].foreground){
+                if (results.segments[results.indexMap[i+1]].background){
+                    data[4 * i + 0] = 255;
+                    data[4 * i + 1] = 0;
+                    data[4 * i + 2] = 0;
+                    data[4 * i + 3] = 255;
+                    //console.log('edge pix..');
+                }
+                else {
+                    data[4 * i + 0] = srcData[4 * i + 0];
+                    data[4 * i + 1] = srcData[4 * i + 1];
+                    data[4 * i + 2] = srcData[4 * i + 2];
+                    data[4 * i + 3] = srcData[4 * i + 3];
+                }
+            }
+            //     else {
+            //         //console.log('ff');
+            //     }
+            // }
+            // else {
+            //     //console.log('b*');
+            // }
+    }
+    context.globalCompositeOperation="destination-over";
     context.putImageData(imageData, 0, 0);
 };
 

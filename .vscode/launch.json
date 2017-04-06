@@ -10,7 +10,9 @@
     "request": "launch",
     "name": "Launch Chrome",
     "url": "http://localhost:5003",
-    "webRoot": "${workspaceRoot}"
-}]
+    "webRoot": "${workspaceRoot}",
+    "sourceMaps": true
+}
+]
 
 }
