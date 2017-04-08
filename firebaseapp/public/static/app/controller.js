@@ -130,19 +130,34 @@ function addAccessors($scope) {
 
 
 $scope.export = function() {
+    // if (!fabric.Canvas.supports('toDataURL')) {
+    //   alert('This browser doesn\'t provide means to serialize canvas to an image');
+    // }
+    // else {
+    //   fabric.Image.fromURL(output_canvas.toDataURL(), function(img) {
+    //         canvas.add(img);
+    //         img.bringToFront();
+    //         canvas.renderAll();
+    //         state.recompute = true;
+    //     });
+    // }
+
+    $scope.addOnClick();
+  };
+
+$scope.canvasFinalResult = function() {
     if (!fabric.Canvas.supports('toDataURL')) {
       alert('This browser doesn\'t provide means to serialize canvas to an image');
     }
     else {
       fabric.Image.fromURL(output_canvas.toDataURL(), function(img) {
-            canvas.add(img);
+            output_canvas.add(img);
             img.bringToFront();
-            canvas.renderAll();
-            state.recompute = true;
+            output_canvas.renderAll();
+            //state.recompute = true;
         });
     }
   };
-
 
   $scope.download = function() {
     if (!fabric.Canvas.supports('toDataURL')) {
@@ -608,6 +623,9 @@ $scope.renderResults = function(){
     //$scope.renderClipShape();
     // 生成结果图
     context.putImageData(imageData, 0, 0);
+
+
+
 };
 
 
@@ -837,24 +855,36 @@ $scope.segment = function () {
         }
         $scope.updateClusters();
         $scope.renderResults();
+        //lsw
+        //$scope.canvasFinalResult();
         $scope.status = "Segmentation completed";
         state.recompute = false;
+
+        $scope.addObjectEvent();
     }
     else {
         $scope.status = "Please mark background and foreground !! "
     }
 };
 
+$scope.addObjectEvent = function() {
 
+  srcImag = canvas.item(0);
+  srcImag.on({
+    'event:moving': function(e) {
+      console.log('srcImag moving..');
+    },
+  });
+}
 
 $scope.addOnClick = function(event) {
-		if ( event.layerX ||  event.layerX == 0) { // Firefox
-			mouseX = event.layerX ;
-			mouseY = event.layerY;
-		} else if (event.offsetX || event.offsetX == 0) { // Opera
-			mouseX = event.offsetX;
-			mouseY = event.offsetY;
-		}
+		// if ( event.layerX ||  event.layerX == 0) { // Firefox
+		// 	mouseX = event.layerX ;
+		// 	mouseY = event.layerY;
+		// } else if (event.offsetX || event.offsetX == 0) { // Opera
+		// 	mouseX = event.offsetX;
+		// 	mouseY = event.offsetY;
+		// }
         if (state.results)
         {
         var segment = state.results.segments[state.results.indexMap[width*mouseY+mouseX]],
@@ -941,16 +971,28 @@ function watchCanvas($scope) {
         canvas.renderAll();
       }
     },
-    'object:moved': function(e) {
-      e.target.opacity = 0.5;
-      console.log('object in canvas moved');
+    'touch:drag': function(e) {
+      console.log('dragging...');
+    },
+    'mouse:move': function(e) {
+      //e.target.opacity = 0.5;
+      console.log('mouse moving..');
     },
     'object:moving': function(e) {
       console.log('object moving..');
+      var x = e.e.clientX;
+      var y = e.e.clientY;
+      output_canvas.item(0).top = canvas.item(0).top;
+      output_canvas.item(0).left = canvas.item(0).left;
+      output_canvas.renderAll();
+    },
+    'touch:drag': function(e) {
+      console.log('dragging...');
     },
     'object:scaling': function(e) {
       e.target.opacity = 1;
       console.log('object in canvas scaling');
+      $scope.segmentation();
       // output_canvas_ctx = output_canvas.getContext('2d');
       // output_canvas_ctx.scale(canvas.getZoom(), canvas.getZoom());
     }

@@ -3,7 +3,8 @@
  * Created by aub3 on 5/1/15.
  */
 var canvas = new fabric.Canvas('canvas'),
-    output_canvas = document.getElementById('output_canvas'),
+    //output_canvas = document.getElementById('output_canvas'),
+    output_canvas = new fabric.Canvas('output_canvas'),
     width = canvas.getWidth(),
     height = canvas.getHeight(),
     jqwindow = $(window),
@@ -27,6 +28,13 @@ var canvas = new fabric.Canvas('canvas'),
 
 
 initialize_ui = function () {
+
+    fabric.Image.fromURL('preview_original.jpeg', function(img) {
+            output_canvas.add(img);
+            img.bringToFront();
+            output_canvas.renderAll();
+            //state.recompute = true;
+        });
 
     //lsw added
     canvas.setWidth(640);
