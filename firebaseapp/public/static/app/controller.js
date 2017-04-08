@@ -602,9 +602,18 @@ $scope.renderResults = function(){
 
     // set background red 
     //output_canvas.setBgColor();
+    if (output_canvas.getObjects().length > 0) {
+      output_canvas.remove(output_canvas.item(0));
+    }
+
+    var c = document.createElement('canvas');
+    c.setAttribute('id', '_temp_canvas');
+    c.width = canvas.width;
+    c.height = canvas.height;
+    var context = c.getContext('2d');
 
     var results = state.results;
-    var context = output_canvas.getContext('2d');
+    //var context = output_canvas.getContext('2d');
 
     var imageData = context.createImageData(output_canvas.width, output_canvas.height);
     var data = imageData.data;
@@ -622,10 +631,18 @@ $scope.renderResults = function(){
     }
     //$scope.renderClipShape();
     // 生成结果图
+    //context.putImageData(imageData, 0, 0);
+
     context.putImageData(imageData, 0, 0);
-
-
-
+    fabric.Image.fromURL(c.toDataURL(), function(img) {
+        //img.left = segment.min_x;
+        //img.top = segment.min_y;
+        output_canvas.add(img);
+        img.bringToFront();
+        c = null;
+        $('#_temp_canvas').remove();
+        output_canvas.renderAll();
+    });
 };
 
 
@@ -947,6 +964,7 @@ function watchCanvas($scope) {
 
   function segmentBtnClicked() {
       console.log('ran into segmentBtnClicked');
+      state.recompute = true;
       var btn = document.getElementById('segment');
       btn.click();
   }

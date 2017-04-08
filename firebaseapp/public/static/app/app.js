@@ -29,12 +29,12 @@ var canvas = new fabric.Canvas('canvas'),
 
 initialize_ui = function () {
 
-    fabric.Image.fromURL('preview_original.jpeg', function(img) {
-            output_canvas.add(img);
-            img.bringToFront();
-            output_canvas.renderAll();
-            //state.recompute = true;
-        });
+    // fabric.Image.fromURL('preview_original.jpeg', function(img) {
+    //         output_canvas.add(img);
+    //         img.bringToFront();
+    //         output_canvas.renderAll();
+    //         //state.recompute = true;
+    //     });
 
     //lsw added
     canvas.setWidth(640);
