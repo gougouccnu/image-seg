@@ -149,38 +149,39 @@ $scope.export = function() {
       alert('This browser doesn\'t provide means to serialize canvas to an image');
     }
     else {
-      //window.open(output_canvas.toDataURL('png'));
-    //   $('#output_canvas').get(0).toBlob(function(blob){
-	// 	saveAs(blob, "output.png");
-	//   });
-
-      var outputCanvas = new fabric.Canvas('output_canvas');
-      outputCanvas.setWidth(640);
-      outputCanvas.setHeight(640);
-      var rect = new fabric.Rect({
-  left: 100,
-  top: 100,
-  fill: 'red',
-  width: 20,
-  height: 20
-});
-      outputCanvas.add(rect); // add object
-      var rect2 = new fabric.Rect({
-  left: 140,
-  top: 140,
-  fill: 'red',
-  width: 20,
-  height: 20,
-  angle: 45
-});
-      outputCanvas.add(rect2);
-      outputCanvas.renderAll();
-      var htmlElement = $('#output_canvas')
-      console.log(htmlElement)
-      htmlElement.get(0).toBlob(function(blob){
-		saveAs(blob, "output.png");
-	  });
+      window.open(output_canvas.toDataURL('png'));
+      $('#output_canvas').get(0).toBlob(function(blob){
+		    saveAs(blob, "output.png");
+	    });
     }
+
+//       var outputCanvas = new fabric.Canvas('output_canvas');
+//       outputCanvas.setWidth(640);
+//       outputCanvas.setHeight(640);
+//       var rect = new fabric.Rect({
+//   left: 100,
+//   top: 100,
+//   fill: 'red',
+//   width: 20,
+//   height: 20
+// });
+//       outputCanvas.add(rect); // add object
+//       var rect2 = new fabric.Rect({
+//   left: 140,
+//   top: 140,
+//   fill: 'red',
+//   width: 20,
+//   height: 20,
+//   angle: 45
+// });
+//       outputCanvas.add(rect2);
+//       outputCanvas.renderAll();
+//       var htmlElement = $('#output_canvas')
+//       console.log(htmlElement)
+//       htmlElement.get(0).toBlob(function(blob){
+// 		saveAs(blob, "output.png");
+// 	  });
+//     }
   };
 
   $scope.getSelected = function() {
@@ -813,7 +814,7 @@ canvas.calcOffset();
 }
 
 $scope.segment = function () {
-    $scope.zoomIt(1.5);
+    //$scope.zoomIt(1.5);
     $scope.setFreeDrawingMode(false,$scope.current_mode);
     $scope.check_movement();
     if (state.masks_present) {
@@ -909,6 +910,7 @@ function watchCanvas($scope) {
 
   function updateScope() {
     console.log('ran into updateScope');
+
     $scope.$$phase || $scope.$digest();
     canvas.renderAll();
   }
@@ -925,6 +927,34 @@ function watchCanvas($scope) {
     .on('path:created', updateScope)
     .on('selection:cleared', updateScope)
     .on('path:created', segmentBtnClicked);
+
+  canvas.on({
+    'mouse:down': function(e) {
+      if (e.target) {
+        e.target.opacity = 0.5;
+        canvas.renderAll();
+      }
+    },
+    'mouse:up': function(e) {
+      if (e.target) {
+        e.target.opacity = 1;
+        canvas.renderAll();
+      }
+    },
+    'object:moved': function(e) {
+      e.target.opacity = 0.5;
+      console.log('object in canvas moved');
+    },
+    'object:moving': function(e) {
+      console.log('object moving..');
+    },
+    'object:scaling': function(e) {
+      e.target.opacity = 1;
+      console.log('object in canvas scaling');
+      // output_canvas_ctx = output_canvas.getContext('2d');
+      // output_canvas_ctx.scale(canvas.getZoom(), canvas.getZoom());
+    }
+  });
 }
 
 cveditor.controller('CanvasControls', function($scope) {
