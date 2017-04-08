@@ -120,6 +120,8 @@ initialize_ui = function () {
       var newZoom = canvas.getZoom() + e.deltaY / 300;
         if (newZoom > 0.1 && newZoom < 10){
             canvas.zoomToPoint({ x: e.offsetX, y: e.offsetY }, newZoom);
+            //lsw 
+            output_canvas.zoomToPoint({ x: e.offsetX, y: e.offsetY }, newZoom);
             state.recompute = true;
             renderVieportBorders();
         }
