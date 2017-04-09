@@ -477,8 +477,8 @@ $scope.renderSuperpixels = function(){
     //         }
     // }
     // context.putImageData(imageData, 0, 0);
-    //$scope.renderClipShape();
-    $scope.renderClipShape2Src();
+    $scope.renderClipShape();
+    //$scope.testFindClipShap();
 };
 
 $scope.renderMixed = function(){
@@ -653,6 +653,9 @@ $scope.renderClipShape = function(){
     var imageData = context.createImageData(output_canvas.width, output_canvas.height);
     var data = imageData.data;
     var seg;
+    var isClipShapePoint = false;
+    var clipShapePointArray = [];
+
     for (var i = 0; i < results.indexMap.length-1; ++i) {
             //seg = results.segments[results.indexMap[i]];
             data[4 * i + 3] = 0;
@@ -663,6 +666,8 @@ $scope.renderClipShape = function(){
                     data[4 * i + 2] = 0;
                     data[4 * i + 3] = 255;
                     //console.log('edge pix..');
+                    isClipShapePoint = true;
+                    clipShapePointArray.push({x: i % canvas.width, y: i / canvas.width});
                 }
             }
             // else {
@@ -675,19 +680,81 @@ $scope.renderClipShape = function(){
                     data[4 * i + 2] = 0;
                     data[4 * i + 3] = 255;
                     //console.log('edge pix..');
+                    isClipShapePoint = true;
                 }
             }
-            //     else {
-            //         //console.log('ff');
-            //     }
-            // }
-            // else {
-            //     //console.log('b*');
-            // }
+            if (isClipShapePoint) {
+              //clipShapePointArray.push({x: i % canvas.width, y: i / canvas.width});
+              isClipShapePoint = false
+            }
     }
-    context.stroke();
-    context.putImageData(imageData, 0, 0);
+    var poly = new fabric.Polyline(clipShapePointArray, {
+      stroke: 'red',
+      left: 0,
+      top: 0,
+      fill: null
+    });
+
+    canvas.add(poly);
 };
+
+$scope.testFindClipShap = function(){
+
+  function searchMaxX(testPointArray) {
+    var maxX = testPointArray[0] % canvas.width;
+    for (var i = 0; i < testPointArray.length; i++) {
+      var x = testPointArray[i] % canvas.width;
+      if (x >= maxX) {
+        maxX = x;
+      }
+    }
+    return maxX;
+  }
+
+  var testPointArray = [
+      { x: 10, y: 10 },
+    { x: 50, y: 10 },
+    { x: 11, y: 11},
+    { x: 51, y: 11 },
+    { x: 12, y: 12 },
+    { x: 52, y: 12 }
+    ];
+    var minX = 40;
+    var maxX = 52;
+
+    var resultArray = [];
+    resultArray.push(testPointArray[0]);
+
+    for (var i = 1; i < testPointArray.length - 1; i++) {
+      var lastResult = resultArray[i-1];
+      // search for right
+      if (lastResult.x < maxX) {
+        for (var j = 0; j < testPointArray.length - i; j++) {
+          if (testPointArray[j + i].x > lastResult.x) {
+            resultArray.push(testPointArray[j+i]);
+            break;
+          }
+        }
+      } else { //search for left 
+        // for (var j = 0; j < testPointArray.length - i; j++) {
+        //   if (testPointArray[j + i].y > lastResult.y) {
+        //     resultArray.push(testPointArray[j+i]);
+        //     break;
+        //   }
+        console.log('left');
+      }
+    }
+    console.log(resultArray);
+
+    var poly = new fabric.Polyline(resultArray, {
+      stroke: 'red',
+      left: 0,
+      top: 0,
+      fill: null
+    });
+
+    canvas.add(poly);
+}
 
 $scope.renderClipShape2Src = function(){
     var results = state.results;
