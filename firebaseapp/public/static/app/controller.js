@@ -477,7 +477,7 @@ $scope.renderSuperpixels = function(){
     //         }
     // }
     // context.putImageData(imageData, 0, 0);
-    $scope.renderClipShape();
+    $scope.renderClipShape2Src();
     //$scope.testFindClipShap();
 };
 
@@ -655,6 +655,7 @@ $scope.renderClipShape = function(){
     var seg;
     var isClipShapePoint = false;
     var clipShapePointArray = [];
+    var clipShapePointArray2 = [];
 
     for (var i = 0; i < results.indexMap.length-1; ++i) {
             //seg = results.segments[results.indexMap[i]];
@@ -681,6 +682,7 @@ $scope.renderClipShape = function(){
                     data[4 * i + 3] = 255;
                     //console.log('edge pix..');
                     isClipShapePoint = true;
+                    clipShapePointArray2.push({x: i % canvas.width, y: i / canvas.width});
                 }
             }
             if (isClipShapePoint) {
@@ -694,8 +696,15 @@ $scope.renderClipShape = function(){
       top: 0,
       fill: null
     });
+    var poly2 = new fabric.Polyline(clipShapePointArray2, {
+      stroke: 'red',
+      left: 0,
+      top: 0,
+      fill: null
+    });
 
     canvas.add(poly);
+    canvas.add(poly2);
 };
 
 $scope.testFindClipShap = function(){
@@ -758,12 +767,20 @@ $scope.testFindClipShap = function(){
 
 $scope.renderClipShape2Src = function(){
     var results = state.results;
-    var context = canvas.getContext('2d');
+    
+    var c = document.createElement('canvas');
+    c.setAttribute('id', '_temp_canvas');
+    c.width = canvas.width;
+    c.height = canvas.height;
+    var context = c.getContext('2d');
+
+    //var context = canvas.getContext('2d');
     var imageData = context.createImageData(canvas.width, canvas.height);
     var srcImageData = context.getImageData(0, 0, canvas.width, canvas.height);
     var srcData = srcImageData.data;
     var data = imageData.data;
     var seg;
+
     for (var i = 0; i < results.indexMap.length-1; ++i) {
             //seg = results.segments[results.indexMap[i]];
             //data[4 * i + 3] = 0;
@@ -779,12 +796,9 @@ $scope.renderClipShape2Src = function(){
                     data[4 * i + 0] = srcData[4 * i + 0];
                     data[4 * i + 1] = srcData[4 * i + 1];
                     data[4 * i + 2] = srcData[4 * i + 2];
-                    data[4 * i + 3] = srcData[4 * i + 3];
+                    data[4 * i + 3] = 0;
                 }
             }
-            // else {
-            //     //console.log('f*');
-            // }
             if (results.segments[results.indexMap[i]].foreground){
                 if (results.segments[results.indexMap[i+1]].background){
                     data[4 * i + 0] = 255;
@@ -797,19 +811,23 @@ $scope.renderClipShape2Src = function(){
                     data[4 * i + 0] = srcData[4 * i + 0];
                     data[4 * i + 1] = srcData[4 * i + 1];
                     data[4 * i + 2] = srcData[4 * i + 2];
-                    data[4 * i + 3] = srcData[4 * i + 3];
+                    data[4 * i + 3] = 0;
                 }
             }
-            //     else {
-            //         //console.log('ff');
-            //     }
-            // }
-            // else {
-            //     //console.log('b*');
-            // }
     }
-    context.globalCompositeOperation="destination-over";
+    //context.globalCompositeOperation="destination-over";
+    //context.putImageData(imageData, 0, 0);
+
     context.putImageData(imageData, 0, 0);
+    fabric.Image.fromURL(c.toDataURL(), function(img) {
+        //img.left = segment.min_x;
+        //img.top = segment.min_y;
+        canvas.add(img);
+        img.bringToFront();
+        c = null;
+        $('#_temp_canvas').remove();
+        canvas.renderAll();
+    });
 };
 
 
