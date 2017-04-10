@@ -1083,14 +1083,21 @@ function watchCanvas($scope) {
     },
     'object:moving': function(e) {
       console.log('object moving..');
-      var x = e.e.clientX;
-      var y = e.e.clientY;
-      output_canvas.item(0).top = canvas.item(0).top;
-      output_canvas.item(0).left = canvas.item(0).left;
-      output_canvas.renderAll();
+      // var x = e.e.clientX;
+      // var y = e.e.clientY;
+      // output_canvas.item(0).top = canvas.item(0).top;
+      // output_canvas.item(0).left = canvas.item(0).left;
+      // output_canvas.renderAll();
     },
     'touch:drag': function(e) {
       console.log('dragging...');
+    },
+    'object:added': function(e) {
+      console.log('object added...');
+      len = canvas.getObjects().length;
+      for (var i = 0; i < len; i++) {
+        canvas.item(i).set('selectable', false);
+      }
     },
     'object:scaling': function(e) {
       e.target.opacity = 1;
